@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Make it seamless</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23f00'/%3E%3C/svg%3E">
+<style>
+@font-face{font-family:"Alpina Fine";src:url(fonts/GT-Alpina-Fine-Extended-Bold-Trial.otf) format("opentype");font-weight:700;font-display:block}
+@font-face{font-family:"Alpina Tw";src:url(fonts/GT-Alpina-Typewriter-Regular-Trial.otf) format("opentype");font-display:block}
+@font-face{font-family:"America Exp";src:url(fonts/GT-America-Expanded-Light-Trial.otf) format("opentype");font-weight:300;font-display:block}
+:root{--zw:#000;--rood:#f00;--wit:#fff;--grijs:#d9d9d9;--fine:"Alpina Fine",Georgia,serif;--tw:"Alpina Tw","Courier New",monospace;--am:"America Exp",Arial,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--wit);color:var(--zw);font-family:var(--am);font-weight:300;-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+img{display:block}
+
+/* ---------- logo ---------- */
+.mm{position:absolute;font-family:var(--fine);font-weight:700;line-height:1;letter-spacing:-.02em;color:var(--zw);cursor:pointer;user-select:none;z-index:20}
+.mm i{font-style:normal;color:var(--rood)}
+.dark .mm{color:var(--wit)}
+
+/* ================= DESK ================= */
+#desk{min-height:100vh}
+.page{position:relative}
+.stage{position:relative;width:1512px;height:982px;overflow:hidden;background:var(--wit)}
+.fit{display:flex;align-items:center;justify-content:center;min-height:100vh;overflow:hidden}
+.fit.dark{background:var(--zw)}
+.fit.dark .stage{background:var(--zw)}
+.desk-mm{left:8px;top:13px;font-size:74px}
+
+/* pagina 1: QR + carrousel */
+.ring{position:absolute;inset:0}
+.ring figure{position:absolute;margin:0;width:236px;height:236px;display:flex;align-items:center;justify-content:center;will-change:transform}
+.ring img{max-width:100%;max-height:100%;object-fit:contain}
+.qr{position:absolute;left:588px;top:453px;width:407px;height:434px;display:flex;align-items:center;justify-content:center;background:var(--wit);z-index:3}
+.qr svg{width:380px;height:380px;display:block}
+
+/* pagina 2: raster */
+#pGrid .stage{height:auto;min-height:982px;overflow:visible;padding:100px 0 120px}
+.grid{display:grid;grid-template-columns:repeat(7,184px);column-gap:20px;row-gap:12px;width:1408px;margin-left:48px}
+.tile{position:relative;width:184px;height:195px;display:block;text-align:center}
+.tile .ph{width:184px;height:181px;display:flex;align-items:center;justify-content:center}
+.tile .ph img{max-width:100%;max-height:100%;object-fit:contain}
+.tile .cap{display:block;margin-top:3px;font-size:8px;line-height:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .big{position:absolute;left:50%;top:50%;width:279px;height:299px;background:var(--wit);transform:translate(-50%,-50%) scale(.66);opacity:0;pointer-events:none;transition:transform .28s cubic-bezier(.2,.8,.2,1),opacity .2s;z-index:10;display:flex;flex-direction:column}
+.tile .big .bp{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.tile .big .bp img{max-width:100%;max-height:100%;object-fit:contain}
+.tile .big .bc{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;font-size:8px;line-height:12px;padding:5px 2px 2px}
+.tile .big .bc span:first-child{text-align:left}.tile .big .bc span:last-child{text-align:right}
+.tile:hover,.tile:focus-visible{z-index:9;outline:none}
+.tile:hover .big,.tile:focus-visible .big{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.grid.zoekt .tile img{animation:flick 1.1s steps(1,end) infinite;animation-delay:var(--d)}
+@keyframes flick{0%{filter:none}45%{filter:grayscale(1)}}
+.tile.uit{display:none}
+.grid.leeg .tile img{filter:grayscale(1)}
+.grid .tile{animation:inkom .45s both;animation-delay:var(--a,0s)}
+@keyframes inkom{from{opacity:0;transform:translateY(8px)}}
+
+/* pagina 3: detail */
+.descbox{position:absolute;left:82px;top:481px;width:327px;min-height:421px;background:var(--grijs);padding:20px 20px 24px}
+.descbox h2{margin:0 0 12px;font-family:var(--tw);font-weight:400;font-size:14px;line-height:1.2}
+.descbox p{margin:0;font-size:10px;line-height:1.55}
+.zoom{position:absolute;left:524px;top:100px;width:463px;height:617px;display:flex;align-items:center;justify-content:center}
+.zoomwin{position:relative;overflow:hidden;cursor:zoom-in;max-width:100%;max-height:100%}
+.zoomwin img{width:100%;height:100%;transition:transform .25s ease-out;transform-origin:50% 50%}
+.zoomwin.on img{transform:scale(2.4)}
+.patch{position:absolute;display:block;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.patch img{width:100%;height:100%}
+.pin{left:1285px;top:783px;width:141px;height:141px}
+.pin .pt{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.pin .txt{font-family:"Old Standard TT",var(--fine);font-size:31px;fill:var(--wit);transition:fill .25s}
+.pin .kop{fill:#121428;transition:fill .25s}
+.pin:hover{transform:scale(1.1)}
+.pin:hover .txt{fill:var(--zw)}
+.pin:hover .kop{fill:var(--wit)}
+
+/* pagina 4: laden */
+.pct{position:absolute;left:0;right:0;top:363px;text-align:center;font-family:var(--tw);font-size:36.67px;color:var(--wit);font-variant-numeric:tabular-nums}
+.bar{position:absolute;left:296px;top:451px;width:921px;height:149px;border-radius:75px;background:var(--wit);box-shadow:0 0 0 3px #3a0000,0 6px 18px rgba(255,0,0,.25);padding:15px}
+.bar .fill{height:100%;width:0;min-width:119px;border-radius:60px;background:repeating-linear-gradient(-45deg,var(--rood) 0 26px,var(--wit) 26px 52px);background-size:73.5px 73.5px;box-shadow:inset 0 0 0 3px var(--rood);animation:streep 1.1s linear infinite;transition:width .4s ease-out}
+@keyframes streep{to{background-position:73.5px 0}}
+
+/* pagina 5: resultaat */
+.foto{position:absolute;left:461px;top:148px;width:485px;height:754px;background:#e9e9e9;overflow:hidden}
+.foto img{width:100%;height:100%;object-fit:cover}
+.meet{position:absolute;inset:0;width:1512px;height:982px;pointer-events:none}
+.meet .ml{stroke:var(--rood);stroke-width:4;fill:none;stroke-dasharray:12 9;animation:mars 1.6s linear infinite}
+.meet .ld{stroke:var(--rood);stroke-width:4;fill:none}
+.meet .draw{stroke-dashoffset:var(--len);animation:teken .9s ease-out forwards;animation-delay:var(--dl)}
+@keyframes teken{to{stroke-dashoffset:0}}
+@keyframes mars{to{stroke-dashoffset:-42}}
+.lab{position:absolute;font-size:14px;line-height:1;white-space:nowrap;opacity:0;animation:verschijn .4s forwards;animation-delay:var(--dl)}
+.num{position:absolute;font-size:12px;line-height:1;white-space:nowrap;opacity:0;animation:verschijn .4s forwards;animation-delay:var(--dl)}
+.num span{outline:none;border-bottom:1px dotted transparent;min-width:1ch;display:inline-block;cursor:text}
+.num span:hover,.num span:focus{border-bottom-color:var(--zw)}
+@keyframes verschijn{to{opacity:1}}
+.seamp{left:1292px;top:770px;width:138px;height:138px}
+.remp{left:74px;top:756px;width:146px;height:146px}
+.swap{position:relative}
+.swap .h{position:absolute;inset:0;opacity:0;transition:opacity .2s}
+.swap .naad{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .2s}
+.swap .naad circle{fill:none;stroke:var(--wit);stroke-width:9;stroke-dasharray:22 15;transform-origin:250px 250px;animation:draai 9s linear infinite;animation-play-state:paused}
+.swap:hover .h,.swap:hover .naad{opacity:1}
+.swap:hover .naad circle{animation-play-state:running}
+@keyframes draai{to{transform:rotate(360deg)}}
+.swap:hover{transform:scale(1.04)}
+
+/* pagina 6: maken */
+.h40{position:absolute;margin:0;font-family:var(--tw);font-weight:400;font-size:40px;line-height:1}
+.tiles5{position:absolute;left:82px;top:224px;display:flex;gap:27px}
+.tiles5 .pt5{width:150px;height:179px;background:var(--grijs);display:flex;align-items:center;justify-content:center;padding:14px}
+.tiles5 svg{width:100%;height:100%}
+.dl{position:absolute;left:836px;top:166px;width:104px;height:26px;background:var(--rood);color:var(--wit);font-size:11px;letter-spacing:0;display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s}
+.dl:hover{background:var(--zw)}
+.dl.bezig{opacity:.6;pointer-events:none}
+.matbox{position:absolute;left:1021px;top:100px;width:409px;height:482px;background:var(--grijs)}
+.matbox ul{list-style:none;margin:0;padding:0;position:absolute;left:38px;top:130px;width:330px}
+.matbox li{position:relative;height:44px;padding-left:37px;font-size:12px;line-height:1.25;display:flex;align-items:flex-start;padding-top:3px}
+.matbox li::before{content:"";position:absolute;left:0;top:0;width:23px;height:23px;border-radius:50%;background:var(--rood)}
+.steps{position:absolute;left:205px;top:626px;list-style:none;margin:0;padding:0;width:760px}
+.steps li{position:absolute;left:0;display:flex;align-items:center;gap:18px;font-size:12px;line-height:1.3;cursor:pointer;width:760px}
+.steps .vk{flex:none;width:37px;height:37px;background:var(--grijs);display:flex;align-items:center;justify-content:center}
+.steps .vk svg{width:22px;height:22px;opacity:0;transition:opacity .15s}
+.steps li.ok .vk svg{opacity:1}
+.steps li.ok span{text-decoration:line-through;text-decoration-color:var(--rood)}
+
+/* ================= TELEFOON ================= */
+#phone{position:fixed;inset:0;overflow:hidden}
+.fp{position:absolute;inset:0;background:var(--wit)}
+.fp.dark{background:var(--zw)}
+.ph-mm{left:max(26px,env(safe-area-inset-left));top:calc(30px + env(safe-area-inset-top));font-size:40px}
+.mic{position:absolute;left:50%;top:50%;width:min(86vw,58vh);aspect-ratio:1;transform:translate(-50%,-46%);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.mic img{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;transition:opacity .15s}
+.mic .w{opacity:0}
+.mic.druk .w{opacity:1}.mic.druk .r{opacity:0}
+.mic svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.mic .ringd{fill:none;stroke:var(--wit);stroke-width:9;stroke-dasharray:30 20;stroke-linecap:butt}
+.mic .ringv{fill:none;stroke:var(--rood);stroke-width:6;stroke-linejoin:round}
+.len{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:234px;margin-top:-30px}
+.len label{display:block;font-family:var(--tw);font-size:14px;color:var(--wit);margin-bottom:20px}
+.len input{width:234px;height:67px;border:0;border-radius:12px;background:var(--grijs);font-family:var(--tw);font-size:28px;text-align:center;color:var(--zw);outline:none;-webkit-appearance:none;appearance:none}
+.len input:focus{box-shadow:0 0 0 3px var(--rood)}
+.camicon{position:absolute;left:50%;top:50%;width:227px;height:227px;transform:translate(-50%,-50%)}
+.camicon img{width:100%;height:100%}
+.camlive{position:absolute;inset:0;background:var(--zw)}
+.camlive video,.camlive canvas,.camlive .still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.camlive .spiegel{transform:scaleX(-1)}
+.silh{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.silh path,.silh circle{fill:none;stroke:var(--wit);stroke-width:3;stroke-dasharray:10 8;vector-effect:non-scaling-stroke;transition:stroke .3s}
+.silh.ok path,.silh.ok circle{stroke:var(--rood)}
+.tel{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-family:var(--tw);font-size:96px;color:var(--wit);text-shadow:0 2px 12px rgba(0,0,0,.4)}
+@media (prefers-reduced-motion:reduce){.ring figure{transition:none}.bar .fill,.meet .ml{animation:none}}
+</style>
+</head>
+<body>
+
+<!-- ================= DESK ================= -->
+<main id="desk" hidden>
+  <section class="page fit" id="pQR" data-k="fit"><div class="stage">
+    <div class="mm desk-mm" data-home>M<i>M</i></div>
+    <div class="ring" id="ring"></div>
+    <div class="qr" id="qr" aria-label="Scan deze code met je telefoon"></div>
+  </div></section>
+
+  <section class="page" id="pGrid" data-k="w" hidden><div class="stage">
+    <div class="mm desk-mm" data-home>M<i>M</i></div>
+    <div class="grid" id="grid"></div>
+  </div></section>
+
+  <section class="page fit" id="pDetail" data-k="fit" hidden><div class="stage">
+    <div class="mm desk-mm" data-home>M<i>M</i></div>
+    <div class="descbox"><h2 id="dInv"></h2><p id="dDesc"></p></div>
+    <div class="zoom"><div class="zoomwin" id="zoomwin"><img id="dImg" alt=""></div></div>
+    <button class="patch pin" id="pinIt" aria-label="Pin it">
+      <img src="img/patch-red.png" alt="">
+      <svg class="pt" viewBox="0 0 141 141" aria-hidden="true">
+        <g stroke="#b9b9b9" stroke-width="1.3" stroke-linecap="round" stroke-dasharray="17 6">
+          <path d="M64 6 L5 69"/><path d="M75 5 L136 66"/><path d="M134 75 L76 137"/><path d="M5 78 L64 137"/>
+        </g>
+        <g class="kop"><circle cx="64.5" cy="5.5" r="4.3"/><circle cx="137" cy="66" r="4.3"/><circle cx="134" cy="75.5" r="4.3"/><circle cx="5" cy="78" r="4.3"/></g>
+        <g transform="rotate(-14 70 70)"><text class="txt" x="28" y="66">PIN</text><text class="txt" x="74" y="99">IT</text></g>
+      </svg>
+    </button>
+  </div></section>
+
+  <section class="page fit dark" id="pLoad" data-k="fit" hidden><div class="stage">
+    <div class="mm desk-mm" data-home>M<i>M</i></div>
+    <div class="pct" id="pct">0%</div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+  </div></section>
+
+  <section class="page fit" id="pResult" data-k="fit" hidden><div class="stage">
+    <div class="mm desk-mm" data-home>M<i>M</i></div>
+    <div class="foto"><img id="rImg" alt="Jouw foto"></div>
+    <svg class="meet" id="meet" viewBox="0 0 1512 982"></svg>
+    <div id="labels"></div>
+    <button class="patch swap remp" id="remeasure" aria-label="Remeasure">
+      <img src="img/remeasure.png" alt=""><img class="h" src="img/remeasure-h.png" alt="">
+      <svg class="naad" viewBox="0 0 500 500"><circle cx="250" cy="249" r="198"/></svg>
+    </button>
+    <button class="patch swap seamp" id="seamless" aria-label="Make it seamless">
+      <img src="img/seam.png" alt=""><img class="h" src="img/seam-h.png" alt="">
+      <svg class="naad" viewBox="0 0 500 500"><circle cx="250" cy="249" r="200"/></svg>
+    </button>
+  </div></section>
+
+  <section class="page fit" id="pMake" data-k="fit" hidden><div class="stage">
+    <div class="mm desk-mm" data-home>M<i>M</i></div>
+    <h2 class="h40" style="left:77px;top:138px">PATRONEN</h2>
+    <button class="dl" id="dl">DOWNLOAD</button>
+    <div class="tiles5" id="tiles5"></div>
+    <div class="matbox"><h2 class="h40" style="left:50px;top:23px">Materiaallijst</h2><ul id="mat"></ul></div>
+    <h2 class="h40" style="left:204px;top:538px">STAPPENPLAN</h2>
+    <ol class="steps" id="steps"></ol>
+  </div></section>
+</main>
+
+<!-- ================= TELEFOON ================= -->
+<main id="phone" hidden>
+  <section class="fp" id="fMic">
+    <div class="mm ph-mm">M<i>M</i></div>
+    <div class="mic" id="mic" role="button" aria-label="Houd ingedrukt en spreek">
+      <img class="r" src="img/mic-red.png" alt=""><img class="w" src="img/mic-white.png" alt="">
+      <svg viewBox="0 0 800 800"><circle class="ringd" id="ringd" cx="399" cy="399" r="318"/><path class="ringv" id="ringv" d="" hidden/></svg>
+    </div>
+  </section>
+  <section class="fp dark" id="fLen" hidden>
+    <div class="mm ph-mm">M<i>M</i></div>
+    <form class="len" id="lenForm" autocomplete="off">
+      <label for="lenIn">Vul je lengte</label>
+      <input id="lenIn" type="text" inputmode="decimal" enterkeyhint="done" maxlength="5">
+    </form>
+  </section>
+  <section class="fp" id="fCam" hidden>
+    <div class="mm ph-mm">M<i>M</i></div>
+    <button class="camicon" id="camGo" aria-label="Start de camera"><img src="img/camera.png" alt=""></button>
+    <div class="camlive" id="camLive" hidden>
+      <video id="video" class="spiegel" playsinline muted></video>
+      <img class="still" id="still" alt="" hidden>
+      <svg class="silh" id="silh" viewBox="-30 -20 260 560" preserveAspectRatio="xMidYMid meet"><g id="silhG"></g></svg>
+      <div class="tel" id="tel" hidden></div>
+    </div>
+  </section>
+</main>
+
+<script src="data.js"></script>
+<script src="lib/qrcode.js"></script>
+<script>
+"use strict";
+const COLL=window.COLL||[];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=n=>String(Math.round(n*2)/2).replace(".",",");
+const H=location.hash.match(/^#t-([a-z0-9]{4,8})$/);
+const ROLE=H?"telefoon":"desk";
+const ALPHA="abcdefghjkmnpqrstuvwxyz23456789";
+const newCode=()=>{let c="";for(let i=0;i<5;i++)c+=ALPHA[Math.floor(Math.random()*ALPHA.length)];return c};
+
+/* ================= Koppeling telefoon <-> desk =================
+   Openbare MQTT-server (werkt op schoolwifi en mobiele data), met BroadcastChannel voor twee tabbladen op hetzelfde toestel. */
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+function makeLink(code,role){
+  const base="momu-mis/v2/"+code+"/",mine=base+(role==="desk"?"desk":"tel"),theirs=base+(role==="desk"?"tel":"desk"),fotoT=base+"foto";
+  const hs={state:[],foto:[]};let last=0,lastFoto=0,client=null,bc=null,dead=false;
+  let mySeq=0;const me={};
+  const deliver=(kind,d)=>{if(!d||typeof d!=="object")return;
+    if(kind==="state"){if(d.seq&&d.seq<=last)return;last=d.seq||last;hs.state.forEach(h=>h(d.p||{}))}
+    else{if(d.seq&&d.seq<=lastFoto)return;lastFoto=d.seq||lastFoto;hs.foto.forEach(h=>h(d))}};
+  try{bc=new BroadcastChannel("momu-mis-"+code);bc.onmessage=e=>{const m=e.data||{};if(m.to===role)deliver(m.kind,m.d)}}catch(e){}
+  const pub=(topic,obj,retain)=>{const txt=JSON.stringify(obj);if(client&&client.connected){try{client.publish(topic,txt,{retain:!!retain,qos:0})}catch(e){}}};
+  const other=role==="desk"?"telefoon":"desk";
+  const api={
+    set(patch){Object.assign(me,patch);const d={seq:Date.now()*10+(++mySeq%10),p:{...me}};pub(mine,d,true);if(bc)try{bc.postMessage({to:other,kind:"state",d})}catch(e){}},
+    foto(obj){const d={seq:Date.now(),...obj};pub(fotoT,d,true);if(bc)try{bc.postMessage({to:other,kind:"foto",d})}catch(e){}},
+    onState(h){hs.state.push(h)},onFoto(h){hs.foto.push(h)},
+    close(){dead=true;try{if(client){client.publish(mine,"",{retain:true});if(role==="desk")client.publish(fotoT,"",{retain:true});setTimeout(()=>client.end(true),300)}}catch(e){}try{bc&&bc.close()}catch(e){}},
+    get state(){return me}
+  };
+  (async()=>{
+    try{if(typeof mqtt==="undefined")await loadScript("lib/mqtt.min.js")}catch(e){return}
+    if(typeof mqtt==="undefined"||dead)return;
+    const BROKERS=["wss://broker.emqx.io:8084/mqtt","wss://broker.hivemq.com:8884/mqtt","wss://test.mosquitto.org:8081/mqtt"];
+    for(const url of BROKERS){
+      const c=await new Promise(res=>{let c;try{c=mqtt.connect(url,{connectTimeout:6000,reconnectPeriod:0,clean:true,clientId:"momu_"+Math.random().toString(16).slice(2,12)})}catch(e){return res(null)}
+        const t=setTimeout(()=>{try{c.end(true)}catch(e){}res(null)},7000);
+        c.once("connect",()=>{clearTimeout(t);res(c)});c.once("error",()=>{clearTimeout(t);try{c.end(true)}catch(e){}res(null)})});
+      if(c){client=c;break}
+    }
+    if(!client||dead){if(client)client.end(true);return}
+    client.options.reconnectPeriod=2000;
+    client.on("message",(t,buf)=>{let d=null;try{const s=buf.toString();d=s?JSON.parse(s):null}catch(e){}
+      if(t===theirs)deliver("state",d);else if(t===fotoT&&role==="desk")deliver("foto",d)});
+    const sub=()=>{client.subscribe(theirs);if(role==="desk")client.subscribe(fotoT);if(Object.keys(me).length)pub(mine,{seq:Date.now()*10,p:{...me}},true)};
+    client.on("connect",sub);sub();
+  })();
+  addEventListener("pagehide",()=>{if(role==="telefoon")try{client&&client.publish(mine,"",{retain:true})}catch(e){}});
+  return api;
+}
+
+/* ================= Zoeken met je stem ================= */
+const STOP=new Set("toon toonne laat geef zoek zoeken vind vinden me mij ons alle alles al wat er dat die dit deze is zijn past passen passend passende voor een de het en of in met van uit op bij aan ik wil wilt graag iets kleding kledingstuk kledingstukken stukken stuk film films stijl kleur kleuren kan kun mag je jij u even eens nu zien hoi hey hallo please aub alsjeblieft dan als ook nog maar wel heel echt zo soort soorten type types eruit ziet zie welke wie waar mooi mooie leuke leuk".split(" "));
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+const COLORS=[["groen",["groen"]],["rood",["rood","rode"]],["blauw",["blauw"]],["zwart",["zwart"]],["wit",["wit","ivoor"]],["geel",["geel","gele"]],["roze",["roze","rose"]],["paars",["paars","violet","lila","mauve"]],["bruin",["bruin"]],["grijs",["grijs","grijze"]],["beige",["beige","ecru","creme","camel","kaki"]],["oranje",["oranje"]],["goud",["goud"]],["zilver",["zilver"]],["ecru",["ecru","ivoor"]]];
+const COLOR_Q={groen:"groen",groene:"groen",rood:"rood",rode:"rood",blauw:"blauw",blauwe:"blauw",zwart:"zwart",zwarte:"zwart",wit:"wit",witte:"wit",geel:"geel",gele:"geel",roze:"roze",paars:"paars",paarse:"paars",lila:"paars",bruin:"bruin",bruine:"bruin",grijs:"grijs",grijze:"grijs",beige:"beige",oranje:"oranje",goud:"goud",gouden:"goud",zilver:"zilver",zilveren:"zilver",ecru:"ecru",kaki:"beige",donker:null};
+const T=(...a)=>a;
+const TYPES={
+  broek:T("broek","jeansbroek","shorts","hotpants","legging","lange onderbroek","onderbroek","zwembroek","broekpak","overall"),
+  short:T("shorts","hotpants"),jeans:T("jeansbroek"),
+  jas:T("jas","jasje","mantel","overjas","regenjas","stofjas","kamerjas","kapmantel","kammantel","bedjasje","jasschort","cape","pelerine"),
+  mantel:T("mantel","overjas","kapmantel","kammantel","cape","pelerine"),cape:T("cape","pelerine","kapmantel"),
+  jurk:T("jurk","japon","onderjurk","doopjurk","nachtjapon","cheongsam","kaftan"),japon:T("japon"),kleed:T("jurk","japon"),
+  rok:T("rok","onderrok"),
+  hemd:T("hemd","onderhemd","t-shirt","poloshirt","nachthemd"),shirt:T("hemd","t-shirt","poloshirt"),tshirt:T("t-shirt"),polo:T("poloshirt"),
+  blouse:T("blouse","chemisette","corsage","top"),bloes:T("blouse","chemisette"),top:T("top","bustier"),
+  trui:T("trui"),vest:T("vest","gilet","pyjamavest"),gilet:T("gilet"),
+  schoen:T("schoenen","laarzen","klompen"),laars:T("laarzen"),klomp:T("klompen"),
+  hoed:T("hoed","muts","pet","trekmuts","hoofddeksel","kap (hoofddeksel)","helm","steek"),muts:T("muts","trekmuts","kap (hoofddeksel)"),pet:T("pet"),
+  tas:T("tas","handtas","schoudertas","kniptas","beurs"),handtas:T("handtas","kniptas"),
+  kous:T("kousen","slobkousen"),sok:T("kousen"),
+  sjaal:T("sjaal","boa","hoofddoek"),das:T("das","stropdas"),stropdas:T("stropdas","das"),
+  ondergoed:T("onderbroek","lange onderbroek","onderhemd","onderjurk","onderrok","beha","corset","gaine","onderlijf","jarretelgordel","corselet","bustier","sousbras","cache corset"),
+  lingerie:T("beha","corset","gaine","bustier","jarretelgordel","corselet"),corset:T("corset","corselet","cache corset"),beha:T("beha","sousbras"),
+  kraag:T("kraag","bef","kraplap"),schort:T("schort","jasschort","kiel"),
+  pak:T("kostuum (pak)","mantelpak","broekpak","ensemble"),kostuum:T("kostuum (pak)","mantelpak","broekpak"),ensemble:T("ensemble"),
+  badpak:T("badpak","bikini","zwembroek"),bikini:T("bikini"),zwemkleding:T("badpak","bikini","zwembroek"),
+  pyjama:T("pyjamavest","nachthemd","nachtjapon"),nachtkleding:T("pyjamavest","nachthemd","nachtjapon"),
+  handschoen:T("handschoenen","mitaines"),riem:T("riem","ceintuur","gordel"),ceintuur:T("ceintuur"),
+  kimono:T("kimono"),manchet:T("manchetten"),mouw:T("mouwen","ondermouwen"),sluier:T("sluier","rouwsluier"),
+  accessoire:T("sjaal","das","stropdas","riem","ceintuur","handschoenen","handtas","tas","beurs","broche","hoed","muts","pet","waaier","kraag","manchetten")
+};
+const TYPE_Q={};
+Object.keys(TYPES).forEach(k=>{TYPE_Q[k]=k;["en","s","'s","je","jes"].forEach(s=>TYPE_Q[k+s]=k)});
+Object.assign(TYPE_Q,{jassen:"jas",jasje:"jas",jasjes:"jas",jack:"jas",jacks:"jas",jurken:"jurk",jurkje:"jurk",jurkjes:"jurk",kleedje:"jurk",kleren:null,rokken:"rok",rokje:"rok",rokjes:"rok",hemden:"hemd",hemdje:"hemd",blouses:"blouse",bloezen:"bloes",truien:"trui",truitje:"trui",vesten:"vest",schoenen:"schoen",schoentjes:"schoen",laarzen:"laars",laarsjes:"laars",klompen:"klomp",hoeden:"hoed",hoedje:"hoed",hoedjes:"hoed",mutsen:"muts",mutsje:"muts",mutsjes:"muts",petten:"pet",tassen:"tas",tasje:"tas",tasjes:"tas",handtassen:"handtas",kousen:"kous",sokken:"sok",sjaals:"sjaal",sjaaltje:"sjaal",dassen:"das",stropdassen:"stropdas",kragen:"kraag",kraagje:"kraag",schorten:"schort",pakken:"pak",kostuums:"kostuum",badpakken:"badpak",handschoenen:"handschoen",riemen:"riem",broeken:"broek",broekje:"broek",broekjes:"broek",mantels:"mantel",capes:"cape",kimonos:"kimono",manchetten:"manchet",mouwen:"mouw",sluiers:"sluier",accessoires:"accessoire",korsetten:"corset",korset:"corset",onderkleding:"ondergoed",ondergoederen:"ondergoed",bh:"beha","t-shirt":"tshirt","t-shirts":"tshirt",shirts:"shirt",shorts:"short",pyjamas:"pyjama",tops:"top",colbert:"jas",colberts:"jas",blazer:"jas",smoking:"pak",maatpak:"pak"});
+const MATS={zijde:["zijde"],zijden:["zijde"],katoen:["katoen"],katoenen:["katoen"],wol:["wol"],wollen:["wol"],linnen:["linnen"],leer:["leer","leder"],leren:["leer","leder"],kant:["kant"],kanten:["kant"],fluweel:["fluweel"],fluwelen:["fluweel"],satijn:["satijn"],satijnen:["satijn"],denim:["denim","jeans"],jeans:["denim","jeans"],bont:["bont"],tule:["tule"],nylon:["nylon","polyamide"],polyester:["polyester"],viscose:["viscose"],jersey:["jersey"],tricot:["tricot","jersey"],brokaat:["brokaat"],damast:["damast"],tweed:["tweed"],vilt:["vilt"],stro:["stro"],plastic:["plastic","kunststof"],pailletten:["paillet"],kralen:["kraal","kralen"],borduursel:["borduur"],geborduurd:["borduur"],geborduurde:["borduur"],bloemen:["bloem"],gebloemd:["bloem"],gebloemde:["bloem"],strepen:["streep","strepen","gestreept"],gestreept:["streep","strepen","gestreept"],gestreepte:["streep","strepen","gestreept"],ruiten:["ruit"],geruit:["ruit"],geruite:["ruit"],stippen:["stip"],gestipt:["stip"],print:["print","bedrukt"],knopen:["knoop","knopen"],rits:["rits"]};
+const GENDER={man:"man",mannen:"man",heren:"man",heer:"man",manne:"man",jongen:"kind",jongens:"kind",vrouw:"vrouw",vrouwen:"vrouw",dames:"vrouw",dame:"vrouw",meisje:"kind",meisjes:"kind",kind:"kind",kinderen:"kind",kinder:"kind",baby:"kind",babys:"kind"};
+const NUMW={twintig:20,dertig:30,veertig:40,vijftig:50,zestig:60,zeventig:70,tachtig:80,negentig:90};
+const THEMES=[
+  {w:["bond","james","jamesbond","007","spion","agent","geheim","geheimagent","spionage","secret"],types:["kostuum (pak)","hemd","stropdas","das","overjas","jas","mantel","gilet","broek","handschoenen","hoed","ensemble"],need:/voor een man|heren|herenkostuum|smoking|man\b/,boost:/zwart|smoking|avond|wol|zijde|pak/},
+  {w:["bruiloft","trouw","trouwen","huwelijk","bruid","bruids","trouwfeest"],types:["japon","jurk","sluier","ensemble","kostuum (pak)","handschoenen"],need:/bruid|huwelijk|trouw|wit|ivoor|ecru/,boost:/bruid|huwelijk|trouw/},
+  {w:["feest","gala","avond","bal","party","feestje","fuif","receptie","chic","chique","elegant"],types:["japon","jurk","ensemble","kostuum (pak)","bolero","cape","handtas","handschoenen","stropdas"],need:/avond|bal|feest|zijde|satijn|paillet|kralen|fluweel|kant|lam[eé]/,boost:/avond|bal|feest/},
+  {w:["zomer","strand","zee","vakantie","warm","zwemmen","zon"],types:["badpak","bikini","zwembroek","shorts","hotpants","t-shirt","poloshirt","jurk","top","rok","hoed"],need:/./,boost:/katoen|linnen|korte mouw|zomer|stro/},
+  {w:["winter","koud","sneeuw","ski"],types:["mantel","overjas","jas","trui","muts","sjaal","handschoenen","laarzen","kapmantel","pelerine","cape","boa"],need:/./,boost:/wol|bont|vilt|winter/},
+  {w:["werk","werken","arbeid","atelier","keuken"],types:["schort","jasschort","kiel","stofjas","overall","hes"],need:/./,boost:/werk|katoen/},
+  {w:["slapen","nacht","bed","pyjama"],types:["nachthemd","nachtjapon","pyjamavest","kamerjas","bedjasje"],need:/./,boost:/nacht/},
+  {w:["rouw","begrafenis"],types:["rouwsluier","rouwband","japon","mantel","sluier"],need:/rouw|zwart/,boost:/rouw/},
+  {w:["sport","sporten","tennis","fiets","fietsen","turnen"],types:["t-shirt","poloshirt","shorts","broek","trui","legging","beenkappen","kniebeschermers"],need:/./,boost:/sport|tennis|jersey/},
+  {w:["kerk","doop","communie","priester"],types:["doopjurk","rochet","toga","kraag","sluier","scapulier"],need:/./,boost:/doop|kerk|communie/}
+];
+const ITEMTEXT=COLL.map(it=>norm([it.n,it.e,it.t,(it.m||[]).join(" ")].join(" ")));
+const ITEMDESC=COLL.map(it=>norm(it.t||""));
+const ITEMMED=COLL.map(it=>norm((it.m||[]).join(" ")+" "+it.n));
+const ITEMYEARS=COLL.map(it=>{const m=(it.y||"").match(/\d{4}/g);if(!m)return null;const a=m.map(Number);return[Math.min(...a),Math.max(...a)]});
+const NAMES=[...new Set(COLL.map(it=>it.n))];
+function find(qRaw){
+  const q=norm(qRaw||"").replace(/[^a-z0-9\-' ]+/g," ").trim();
+  if(!q)return null;
+  if(/^(toon |geef |laat )?(me |mij )?(alles|alle stukken|alle kleding|alles zien|reset|opnieuw|alle kledingstukken)$/.test(q))return null;
+  const words=q.split(/\s+/).filter(Boolean);
+  const facets=[],loose=[];let theme=null;
+  const types=new Set();
+  for(let i=0;i<words.length;i++){
+    let w=words[i];
+    if(w==="jaren"&&words[i+1]){const nx=words[i+1].replace(/'/g,"");const d=NUMW[nx]||(+nx.replace(/s$/,"")||null);if(d!=null){const dd=d<100?(d>=30?1900+d:(d===20?1920:1900+d)):d;facets.push(Object.assign(i2=>{const y=ITEMYEARS[i2];return y&&y[0]<=dd+9&&y[1]>=dd},{prio:2}));i++;continue}}
+    if(/^\d{4}$/.test(w)){const yy=+w;facets.push(i2=>{const y=ITEMYEARS[i2];return y&&y[0]<=yy+5&&y[1]>=yy-5});continue}
+    if(/^(\d{2})(ste|de|e)$/.test(w)&&words[i+1]&&/^eeuw/.test(words[i+1])){const c=+w.match(/^\d+/)[0];facets.push(i2=>{const y=ITEMYEARS[i2];return y&&y[0]<=c*100-1&&y[1]>=(c-1)*100});i++;continue}
+    if(w==="007"||!STOP.has(w)){
+      if(COLOR_Q[w]!==undefined){const c=COLOR_Q[w];if(c){const roots=COLORS.find(x=>x[0]===c)[1];facets.push(Object.assign(i2=>roots.some(r=>ITEMDESC[i2].includes(r)),{prio:4}))}continue}
+      if(w.startsWith("donker")||w.startsWith("licht")){const rest=w.replace(/^(donker|licht)/,"");if(COLOR_Q[rest]){const roots=COLORS.find(x=>x[0]===COLOR_Q[rest])[1];facets.push(i2=>roots.some(r=>ITEMDESC[i2].includes(w.slice(0,w.length-rest.length)+r)||roots.some(r2=>ITEMDESC[i2].includes(r2))));continue}}
+      if(TYPE_Q[w]!==undefined){if(TYPE_Q[w])TYPES[TYPE_Q[w]].forEach(t=>types.add(t));continue}
+      if(MATS[w]){const r=MATS[w],motief=/bloem|streep|strepen|gestreept|ruit|stip|print|bedrukt|borduur|knoop|knopen|rits|kraal|kralen|paillet/;facets.push(Object.assign(i2=>r.some(x=>motief.test(x)?ITEMTEXT[i2].includes(x):ITEMMED[i2].includes(x)),{prio:3}));continue}
+      if(GENDER[w]){const g=GENDER[w];const re=g==="man"?/voor een man|heren|jongen/:g==="vrouw"?/voor een vrouw|dames|meisje/:/kind|meisje|jongen|baby|zuigeling/;
+        /* staat het geslacht er zelden bij, sluit dan enkel uit wat uitdrukkelijk voor iemand anders is */
+        const anders=g==="man"?/voor een vrouw|dames|meisje|kind/:g==="vrouw"?/voor een man|heren|jongen|kind/:/voor een (man|vrouw)/;
+        const f=Object.assign(i2=>re.test(ITEMDESC[i2]),{prio:1,soft:i2=>!anders.test(ITEMDESC[i2])});facets.push(f);continue}
+      const th=THEMES.find(t=>t.w.includes(w))||(/bond|007/.test(w)?THEMES[0]:null);if(th){theme=th;continue}
+      const nm=NAMES.find(n=>norm(n)===w||norm(n)===w.replace(/(en|s)$/,""));if(nm){types.add(nm);continue}
+      if(w.length>=4)loose.push(w.replace(/(en|e|s)$/,""));
+    }
+  }
+  if(types.size){const ts=[...types];facets.push(Object.assign(i2=>ts.includes(COLL[i2].n),{prio:9}))}
+  let res=[];
+  const idx=COLL.map((_,i)=>i);
+  if(theme){
+    let base=idx.filter(i=>theme.types.includes(COLL[i].n)&&theme.need.test(ITEMDESC[i])&&facets.every(f=>f(i)));
+    if(!base.length)base=idx.filter(i=>theme.types.includes(COLL[i].n)&&facets.every(f=>f(i)));
+    res=base.sort((a,b)=>(theme.boost.test(ITEMTEXT[b])?1:0)-(theme.boost.test(ITEMTEXT[a])?1:0));
+  }else if(facets.length){
+    /* niets gevonden? laat de minst belangrijke voorwaarde vallen (geslacht, periode, materiaal, kleur) */
+    let fs=facets.slice().sort((a,b)=>(b.prio||5)-(a.prio||5));
+    res=idx.filter(i=>fs.every(f=>f(i)));
+    fs.forEach((f,n)=>{if(f.soft){const zonder=fs.filter(x=>x!==f),ruim=idx.filter(i=>zonder.every(x=>x(i)));if(res.length<Math.max(8,ruim.length*.25)){res=ruim.filter(i=>f.soft(i));fs[n]=f.soft}}});
+    while(!res.length&&fs.length>1){fs.pop();res=idx.filter(i=>fs.every(f=>f(i)))}
+    if(loose.length){const r2=res.filter(i=>loose.some(l=>ITEMTEXT[i].includes(l)));if(r2.length)res=r2}
+  }else if(loose.length){
+    res=idx.filter(i=>loose.some(l=>ITEMTEXT[i].includes(l)));
+  }else return null;
+  return res;
+}
+
+/* ================= Patronen ================= */
+const LIB={
+  voorpand:{naam:"Voorpand",d:"M30 70 Q62 66 72 22 L140 42 Q126 90 150 108 L140 236 L30 244 Z",fold:[72,242]},
+  voorpand_punt:{naam:"Voorpand met punt",d:"M30 70 Q62 66 72 22 L140 42 Q126 90 150 108 L142 214 Q92 226 30 256 Z",fold:[72,254]},
+  zijpand:{naam:"Zijpand",d:"M72 30 Q100 26 122 40 Q108 120 132 236 L68 236 Q88 120 72 30 Z"},
+  achterpand:{naam:"Achterpand",d:"M30 46 Q52 48 66 30 L140 48 Q128 92 152 112 L142 236 L30 240 Z",fold:[48,238]},
+  jasvoorpand:{naam:"Jasvoorpand",d:"M40 60 Q66 58 76 16 L140 34 Q128 80 152 98 L150 252 L40 252 Z"},
+  jurkvoorpand:{naam:"Jurkpand",d:"M30 52 Q56 50 64 18 L112 30 Q104 64 124 78 L172 252 L30 252 Z",fold:[54,250]},
+  rechtemouw:{naam:"Lange mouw",d:"M14 70 Q56 4 100 8 Q144 4 186 70 L156 252 L44 252 Z"},
+  kortemouw:{naam:"Korte mouw",d:"M10 96 Q54 14 100 16 Q146 14 190 96 L176 176 L24 176 Z"},
+  tweedeligemouw:{naam:"Bovenmouw",d:"M20 64 Q60 4 104 10 Q150 18 176 72 L150 150 L156 252 L58 252 Q66 160 20 64 Z"},
+  pofmouw:{naam:"Pofmouw",d:"M6 110 Q50 -6 100 10 Q150 -6 194 110 L170 170 L30 170 Z",gather:[42,158,30],grain:[100,55,100,155]},
+  hammouw:{naam:"Hammouw",d:"M4 84 Q48 -8 100 6 Q152 -8 196 84 Q150 118 134 168 L126 254 L74 254 L66 168 Q50 118 4 84 Z",gather:[42,158,26]},
+  klokmouw:{naam:"Klokmouw",d:"M52 60 Q100 2 148 60 L196 252 L4 252 Z"},
+  ronde_kraag:{naam:"Ronde kraag",d:"M24 24 Q24 210 186 218 L186 166 Q76 158 72 24 Z",grain:[150,90,150,150]},
+  opstaande_kraag:{naam:"Staande kraag",d:"M8 150 Q100 166 192 136 L192 100 Q100 128 8 112 Z",grain:[60,128,140,124]},
+  matrozenkraag:{naam:"Matrozenkraag",d:"M20 20 L130 20 Q136 120 190 236 L160 244 L100 128 L20 150 Z",grain:[60,40,60,120]},
+  rokbaan:{naam:"Rokbaan",d:"M64 20 L136 20 L192 250 L8 250 Z"},
+  plooirok:{naam:"Plooirok (baan)",d:"M10 30 L190 30 L190 240 L10 240 Z",pleats:[40,70,100,130,160]},
+  schortbaan:{naam:"Schortbaan",d:"M20 40 L180 40 L186 244 L14 244 Z",gather:[30,170,52]},
+  manchet:{naam:"Manchet",d:"M10 100 L190 100 L190 160 L10 160 Z",grain:[60,130,140,130]},
+  tailleband:{naam:"Tailleband",d:"M6 116 L194 116 L194 144 L6 144 Z",grain:[60,130,140,130]},
+  broekvoor:{naam:"Broek voorpand",d:"M44 20 L132 20 L136 76 Q144 98 172 104 L156 250 L60 250 Z"},
+  broekachter:{naam:"Broek achterpand",d:"M36 14 L128 24 L138 70 Q150 104 190 110 L166 250 L52 250 Z"},
+  klep:{naam:"Klep",d:"M40 70 L160 70 L160 170 Q100 200 40 170 Z",grain:[100,90,100,160]},
+  plastron:{naam:"Plastron",d:"M60 20 L140 20 L150 240 L100 256 L50 240 Z"},
+  zak:{naam:"Opgestikte zak",d:"M50 70 L150 70 L150 180 Q100 200 50 180 Z",grain:[100,90,100,170]},
+  capuchon:{naam:"Capuchon",d:"M30 236 L30 70 Q40 14 112 16 Q184 26 176 126 L160 236 Z"},
+  cape:{naam:"Cape (halve cirkel)",d:"M6 40 L76 40 Q100 84 124 40 L194 40 Q194 250 100 250 Q6 250 6 40 Z",grain:[100,110,100,230]},
+  sjerp:{naam:"Sjerp",d:"M80 10 L120 10 L120 230 L100 252 L80 230 Z",grain:[100,40,100,200]},
+  das:{naam:"Das",d:"M88 6 L112 6 L118 180 L100 252 L82 180 Z",grain:[100,30,100,200]},
+  rechthoek:{naam:"Baan",d:"M40 10 L160 10 L160 250 L40 250 Z",grain:[100,40,100,220]},
+  beleg:{naam:"Beleg",d:"M40 20 Q50 120 40 250 L80 250 Q90 120 80 20 Z",grain:[60,60,60,200]},
+  cup:{naam:"Cup",d:"M20 180 Q30 40 100 30 Q170 40 180 180 Q100 150 20 180 Z",grain:[100,60,100,160]}
+};
+function pieceSVG(lib){
+  const p=LIB[lib]||LIB.rokbaan,g=p.grain||[100,95,100,195];
+  let s=`<path d="${p.d}" fill="#fff" stroke="#000" stroke-width="3" stroke-linejoin="round"/>`;
+  s+=`<g transform="translate(10 13) scale(.9)"><path d="${p.d}" fill="none" stroke="#000" stroke-width="1.4" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/></g>`;
+  const a=Math.atan2(g[3]-g[1],g[2]-g[0]),ah=(x,y,b)=>`M${x} ${y} l${(-9*Math.cos(b-.45)).toFixed(1)} ${(-9*Math.sin(b-.45)).toFixed(1)} M${x} ${y} l${(-9*Math.cos(b+.45)).toFixed(1)} ${(-9*Math.sin(b+.45)).toFixed(1)}`;
+  s+=`<path d="M${g[0]} ${g[1]} L${g[2]} ${g[3]} ${ah(g[2],g[3],a)} ${ah(g[0],g[1],a+Math.PI)}" stroke="#f00" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+  if(p.fold)s+=`<path d="M30 ${p.fold[0]} L30 ${p.fold[1]}" stroke="#f00" stroke-width="3.5" stroke-dasharray="12 4 2 4"/>`;
+  if(p.gather){const[x1,x2,y]=p.gather;let d=`M${x1} ${y}`;for(let x=x1;x<x2;x+=8)d+=" q4 -5 8 0";s+=`<path d="${d}" stroke="#f00" stroke-width="1.8" fill="none"/>`}
+  if(p.pleats)p.pleats.forEach(x=>{s+=`<path d="M${x} 40 L${x} 230" stroke="#f00" stroke-width="1.6" stroke-dasharray="6 5"/>`});
+  return `<svg viewBox="-6 -10 212 276" aria-hidden="true">${s}</svg>`;
+}
+let M={lengte:170,arm:60,schouder:40,borst:92,heup:98,been:80};
+const taille=()=>Math.round((M.borst*.48+M.heup*.42)*2)/2;
+function dims(lib){
+  const L=M.lengte,b=M.borst,t=taille(),h=M.heup,s=M.schouder,a=M.arm,bn=M.been||L*.47,hals=b*.4,k=56;
+  const R={voorpand:[b/4+2,L*.26],voorpand_punt:[b/4+2,L*.28],achterpand:[b/4+2,L*.26],zijpand:[b/8+1,L*.22],
+    jasvoorpand:[b/4+6,L*.34],jurkvoorpand:[b/4+8,L*.55],rechtemouw:[b*.38,a],kortemouw:[b*.38,a*.35],tweedeligemouw:[b*.3,a],klokmouw:[b*.5,a*.9],pofmouw:[b*.55,a*.35],hammouw:[b*.6,a],
+    ronde_kraag:[hals/2+6,12],opstaande_kraag:[hals/2+1,4.5],matrozenkraag:[s,30],rokbaan:[h/4+6,bn*.75],plooirok:[h*.9,bn*.75],schortbaan:[h/2+10,bn*.8],
+    manchet:[b*.18+3,6],tailleband:[t+4,4],broekvoor:[h/4+1,bn+24],broekachter:[h/4+4,bn+27],klep:[h/4,18],plastron:[12,L*.24],zak:[14,16],
+    capuchon:[k/2+2,k*.62],cape:[s*2.2,L*.35],sjerp:[12,Math.min(90,t*.8)],das:[9,145],rechthoek:[45,L*.95],beleg:[7,L*.3],cup:[b*.17,b*.15]};
+  const r=R[lib]||[30,40];return[Math.round(r[0]*2)/2,Math.round(r[1]*2)/2];
+}
+const NOMAKE_RE=/muts|hoed|pet\b|trekmuts|hoofddeksel|kap \(hoofddeksel\)|helm|steek|schoen|laars|klomp|tas\b|handtas|schoudertas|kniptas|beurs|kous|bril|broche|haarnet/;
+function soort(n){
+  if(/overall/.test(n))return"overall";
+  if(/broekpak|mantelpak|kostuum|ensemble/.test(n))return"pak";
+  if(/broek|short|legging|hotpants|luier/.test(n))return"broek";
+  if(/^rok|onderrok/.test(n))return"rok";
+  if(/cape|pelerine|kapmantel|boa/.test(n))return"cape";
+  if(/schort|kiel/.test(n))return"schort";
+  if(/jas|mantel|kimono|bolero|^jak$|hes$|toga/.test(n))return"jas";
+  if(/jurk|japon|nachthemd|cheongsam|kaftan|djellaba|gewaad|tuniek|overgooier|combinaison|^chemise$|wonsam|rochet/.test(n))return"jurk";
+  if(/kraag|bef|kraplap/.test(n))return"kraag";
+  if(/manchet|mouw/.test(n))return"mouw";
+  if(/corset|corselet|bustier|beha|bikini|badpak|gaine|sousbras|jarretel|onderlijf|maagstuk|borstvulsel|cache/.test(n))return"lijf";
+  if(/das$|stropdas/.test(n))return"das";
+  if(/sjaal|hoofddoek|zakdoek|sluier|sjerp|scapulier/.test(n))return"doek";
+  if(/ceintuur|riem|gordel|bretels|hoofdband|rouwband|epaulet|beenkap|kniebe|dijzak|bursa|^zak$|mitaines|handschoen|plastron/.test(n))return"klein";
+  return"top";
+}
+function patroon(it){
+  const n=it.n,d=norm(it.t||""),has=re=>re.test(d),S=soort(n);
+  const zonder=has(/mouwloos|zonder mouw|geen mouw/),kort=has(/korte mouw|korte pofmouw/);
+  const mouw=has(/hammouw|gigot/)?"hammouw":has(/pofmouw|pof/)?"pofmouw":has(/klokmouw|wijde mouw/)?"klokmouw":kort?"kortemouw":"rechtemouw";
+  const kraag=has(/matrozenkraag/)?["matrozenkraag","Matrozenkraag",2]:has(/opstaande kraag|staande kraag|col\b|boord/)?["opstaande_kraag","Staande kraag",2]:has(/kraag/)?["ronde_kraag","Kraag",2]:null;
+  const knopen=has(/knoop|knopen/),rits=has(/rits/),zakken=has(/zak/),plooi=has(/plooi/),cap=has(/capuchon|kap\b/),manch=has(/manchet/);
+  let delen;
+  switch(S){
+    case"broek":delen=[["broekvoor","Voorpand",2],["broekachter","Achterpand",2],["tailleband","Tailleband",1],["zak","Zak",2],["klep","Gulpbeleg",1]];break;
+    case"overall":delen=[["broekvoor","Broek voorpand",2],["broekachter","Broek achterpand",2],["plastron","Borststuk",1],["sjerp","Bretel",2],["zak","Zak",2]];break;
+    case"pak":delen=[["jasvoorpand","Jasvoorpand",2],["achterpand","Achterpand",1],["rechtemouw","Mouw",2],has(/rok/)?["rokbaan","Rokbaan",2]:["broekvoor","Broek voorpand",2],has(/rok/)?["tailleband","Tailleband",1]:["broekachter","Broek achterpand",2]];break;
+    case"rok":delen=[plooi?["plooirok","Plooirok (baan)",2]:["rokbaan","Rokbaan voor",1],["rokbaan","Rokbaan achter",2],["tailleband","Tailleband",1],["zak","Zak",2],["beleg","Splitbeleg",1]];break;
+    case"cape":delen=[["cape","Cape",1],["cape","Voering",1],cap?["capuchon","Capuchon",2]:["opstaande_kraag","Kraag",2],["tailleband","Halsband",1],["sjerp","Strik",2]];break;
+    case"schort":delen=[["schortbaan","Schortbaan",1],["plastron","Borststuk",1],["tailleband","Tailleband",1],["sjerp","Schortband",2],["zak","Zak",zakken?2:1]];break;
+    case"jas":delen=[["jasvoorpand","Voorpand",2],["achterpand","Achterpand",1],zonder?["beleg","Armsgatbeleg",2]:["tweedeligemouw","Mouw",2],cap?["capuchon","Capuchon",2]:(kraag||["opstaande_kraag","Kraag",2]),["zak","Zak",2]];break;
+    case"jurk":delen=[["jurkvoorpand","Voorpand",1],["jurkvoorpand","Achterpand",2],zonder?["beleg","Armsgatbeleg",2]:[mouw,"Mouw",2],kraag||["beleg","Halsbeleg",1],plooi?["plooirok","Plooirok (baan)",2]:has(/ceintuur|sjerp|strik/)?["sjerp","Ceintuur",2]:["zak","Zak",2]];break;
+    case"kraag":delen=[kraag||["ronde_kraag","Kraag",2],["opstaande_kraag","Halsband",1],["ronde_kraag","Tussenvoering",1]];break;
+    case"mouw":delen=[[mouw,"Mouw",2],["manchet","Manchet",2]];break;
+    case"lijf":delen=[["voorpand_punt","Middenvoor",1],["zijpand","Zijpand",2],["achterpand","Achterpand",2],has(/cup|beha|bikini/)?["cup","Cup",2]:["tailleband","Baleintunnel",4]];break;
+    case"das":delen=[["das","Das",1],["das","Voering",1],["sjerp","Tussenvoering",1]];break;
+    case"doek":delen=[["rechthoek","Baan",1],["rechthoek","Voering",1]];break;
+    case"klein":delen=[["sjerp",n.charAt(0).toUpperCase()+n.slice(1),1],["sjerp","Voering",1],["tailleband","Tussenvoering",1]];break;
+    default:delen=[["voorpand","Voorpand",1],["achterpand","Achterpand",1],zonder?["beleg","Armsgatbeleg",2]:[mouw,"Mouw",2],kraag||["opstaande_kraag","Halsbeleg",1],manch?["manchet","Manchet",2]:["zak","Zak",1]];
+  }
+  /* materiaal */
+  const STOF=/katoen|zijde|wol|linnen|kunstvezel|tule|fluweel|satijn|jersey|leder|kant$|kloskant|naaldkant|tricot|crepe|crêpe|polyester|nylon|polyamide|viscose|denim|vilt|damast|brokaat|tweed|flanel|batist|mousseline|organza|taft|chiffon|georgette|piqué|pique|gabardine|serge|lamé|velours|ribfluweel|jacquard|kasjmier|mohair|acryl|elastaan|lycra|rayon|acetaat|bont|imitatiebont|raffia|stro/;
+  const mats=[...new Set((it.m||[]).map(x=>x.replace(/\s*\(.*?\)\s*/g,"").trim()).filter(x=>x&&STOF.test(x)))];
+  const hoofd=mats[0]||"katoen";
+  let area=0;delen.forEach(([lib,,a])=>{const[w,h]=dims(lib);area+=(w+3)*(h+3)*a});
+  const meter=Math.max(.5,Math.ceil(area*1.15/140/10)/10);
+  const mat=[`Hoofdstof in ${hoofd}: ${fmt(meter)} m (140 cm breed)`,
+    mats[1]&&mats[1]!==hoofd?`${mats[1].charAt(0).toUpperCase()+mats[1].slice(1)} voor de afwerking`:(S==="broek"||S==="rok"?"Katoen voor de zakken: 0,3 m":"Voering: "+fmt(Math.max(.5,Math.round(meter*.8*10)/10))+" m"),
+    "Naaigaren in een passende kleur",
+    knopen?"Knopen: "+Math.max(3,Math.min(14,(d.match(/(\d+)\s*knop/)||[])[1]||(S==="jas"?6:S==="jurk"?8:5)))+" stuks":rits?"Rits: "+(S==="jurk"?55:S==="jas"?60:20)+" cm":(S==="broek"||S==="rok")?"Elastiek of haak en oog voor de taille":"Haakjes en oogjes",
+    "Vlieseline voor "+(kraag?"kraag en beleg":S==="broek"||S==="rok"?"de tailleband":"de belegen")+": 0,5 m",
+    "Kleermakerskrijt en meetlint",
+    "Spelden, naaimachine en stoffenschaar"];
+  /* stappenplan */
+  const zetMouw=delen.some(x=>/mouw/.test(x[0]));
+  const step3={broek:"Stik voor- en achterpanden aan elkaar langs de zijnaden en de binnenbeennaden.",overall:"Stik de broekdelen aan elkaar en zet het borststuk op de taille.",pak:"Stik eerst de jas: panden, schouders en mouwen. Daarna het onderstuk.",rok:"Stik de rokbanen aan elkaar"+(plooi?" en leg de plooien vast op de taille.":" langs de zijnaden."),cape:"Stik cape en voering rechts op rechts aan elkaar en keer om.",schort:"Rimpel de schortbaan in en stik ze op de tailleband.",jas:"Stik voorpanden en achterpand aan elkaar op de schouders en de zijnaden.",jurk:"Stik voor- en achterpand aan elkaar op de schouders en de zijnaden.",kraag:"Stik boven- en onderkraag rechts op rechts, knip in en keer om.",mouw:"Sluit de mouwnaad en stik de manchet erop.",lijf:"Stik de panden aan elkaar en maak tunnels voor de baleinen.",das:"Stik de das rechts op rechts dicht en keer om.",doek:"Leg baan en voering rechts op rechts en stik rondom.",klein:"Stik de delen rechts op rechts en keer om.",top:"Stik voor- en achterpand aan elkaar op de schouders en de zijnaden."}[S];
+  const stappen=["Print het patroon op ware grootte en knip de delen uit.","Leg de delen op de stof volgens de draadrichting, speld vast en knip met 1,5 cm naadwaarde.",step3,
+    zetMouw?"Zet de mouwen in, rimpel de bol licht in waar nodig.":kraag?"Zet de kraag op en strijk de naad naar binnen.":S==="broek"||S==="rok"?"Zet de zakken in en stik de tailleband op.":"Werk de randen af met een bies of een smalle zoom.",
+    knopen?"Maak de knoopsgaten en naai de knopen aan.":rits?"Zet de rits in.":"Werk de sluiting af.",
+    "Zoom alles af, strijk de naden en pas het stuk."];
+  return{delen,mat,stappen,soort:S};
+}
+
+/* PDF op ware grootte, verdeeld over A4-bladen */
+async function loadJsPDF(){if(window.jspdf)return window.jspdf.jsPDF;await loadScript("lib/jspdf.umd.min.js");return window.jspdf.jsPDF}
+function pathBBox(d){const NS="http://www.w3.org/2000/svg",svg=document.createElementNS(NS,"svg");svg.setAttribute("style","position:absolute;width:0;height:0;visibility:hidden");const p=document.createElementNS(NS,"path");p.setAttribute("d",d);svg.appendChild(p);document.body.appendChild(svg);const b=p.getBBox();svg.remove();return b}
+function layoutPieces(delen){
+  const GAP=15,pieces=delen.map(([lib,naam,aantal])=>{const[w,h]=dims(lib);return{lib,naam,aantal,w:w*10,h:h*10,wcm:w,hcm:h}});
+  const maxW=Math.max(...pieces.map(x=>x.w));
+  /* probeer verschillende breedtes en kies de schikking met de minste A4-bladen */
+  let best=null;
+  for(let cols=Math.max(1,Math.ceil((maxW+2*GAP)/190));cols<=8;cols++){
+    const W=cols*190;let x=GAP,y=GAP,rowH=0;const pos=[];
+    [...pieces].sort((a,b)=>b.h-a.h).forEach(pc=>{if(x+pc.w+GAP>W){x=GAP;y+=rowH+GAP;rowH=0}pos.push([pc,x,y]);x+=pc.w+GAP;rowH=Math.max(rowH,pc.h)});
+    const rows=Math.ceil((y+rowH+GAP)/277);
+    if(!best||cols*rows<best.cols*best.rows)best={cols,rows,pos};
+  }
+  /* ook kolomsgewijs proberen: hoge delen naast elkaar, kleine delen eronder */
+  const maxH=Math.max(...pieces.map(x=>x.h));
+  for(let rows=Math.ceil((maxH+2*GAP)/277);rows<=10;rows++){
+    const HH=rows*277,colsArr=[],pos=[];
+    [...pieces].sort((a,b)=>b.h-a.h).forEach(pc=>{
+      let c=colsArr.find(c=>c.y+pc.h+GAP<=HH&&pc.w<=c.w+40);
+      if(!c){const x=colsArr.length?colsArr[colsArr.length-1].x+colsArr[colsArr.length-1].w+GAP:GAP;c={x,y:GAP,w:pc.w};colsArr.push(c)}
+      pos.push([pc,c.x,c.y]);c.y+=pc.h+GAP;c.w=Math.max(c.w,pc.w);
+    });
+    const last=colsArr[colsArr.length-1],cols=Math.ceil((last.x+last.w+GAP)/190);
+    if(cols*rows<best.cols*best.rows)best={cols,rows,pos};
+  }
+  best.pos.forEach(([pc,x,y])=>{pc.x=x;pc.y=y});
+  return{pieces,cols:best.cols,rows:best.rows};
+}
+function drawPiece(ctx,pc,title){
+  const L=LIB[pc.lib],b=pathBBox(L.d),m=new DOMMatrix().translate(pc.x,pc.y).scale(pc.w/b.width,pc.h/b.height).translate(-b.x,-b.y);
+  const base=new Path2D(L.d),out=new Path2D();out.addPath(base,m);
+  const cx=b.x+b.width/2,cy=b.y+b.height/2,inner=new Path2D();inner.addPath(base,m.multiply(new DOMMatrix().translate(cx,cy).scale(.92).translate(-cx,-cy)));
+  ctx.fillStyle="#fff";ctx.fill(out);ctx.strokeStyle="#000";ctx.setLineDash([]);ctx.lineWidth=.6;ctx.stroke(out);
+  ctx.setLineDash([3,2]);ctx.lineWidth=.3;ctx.stroke(inner);ctx.setLineDash([]);
+  const Tp=(x,y)=>m.transformPoint(new DOMPoint(x,y));
+  if(L.fold){const a=Tp(30,L.fold[0]),c=Tp(30,L.fold[1]);ctx.strokeStyle="#f00";ctx.lineWidth=.8;ctx.setLineDash([8,2,1,2]);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(c.x,c.y);ctx.stroke();ctx.setLineDash([])}
+  const g=L.grain||[100,95,100,195],g1=Tp(g[0],g[1]),g2=Tp(g[2],g[3]),ang=Math.atan2(g2.y-g1.y,g2.x-g1.x);
+  ctx.strokeStyle="#f00";ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(g1.x,g1.y);ctx.lineTo(g2.x,g2.y);
+  [[g2,ang],[g1,ang+Math.PI]].forEach(([q,a])=>{ctx.moveTo(q.x,q.y);ctx.lineTo(q.x-5*Math.cos(a-.4),q.y-5*Math.sin(a-.4));ctx.moveTo(q.x,q.y);ctx.lineTo(q.x-5*Math.cos(a+.4),q.y-5*Math.sin(a+.4))});ctx.stroke();
+  const c=Tp(cx,cy),fs=Math.max(4,Math.min(9,pc.w/14));
+  ctx.fillStyle="#000";ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.font=`${fs}px "Alpina Tw", monospace`;ctx.fillText(pc.naam.toUpperCase(),c.x+fs*1.2,c.y-fs*1.4);
+  ctx.font=`${fs*.7}px "America Exp", Arial, sans-serif`;
+  ctx.fillText(`Knip ${pc.aantal}x${L.fold&&pc.aantal===1?" op de stofvouw":""}`,c.x+fs*1.2,c.y);
+  ctx.fillText(`${fmt(pc.wcm)} x ${fmt(pc.hcm)} cm`,c.x+fs*1.2,c.y+fs*1.1);
+  ctx.font=`${fs*.55}px "America Exp", Arial, sans-serif`;ctx.fillStyle="#555";ctx.fillText(title,c.x+fs*1.2,c.y+fs*2.1);
+}
+async function buildPDF(it,p){
+  const jsPDF=await loadJsPDF(),lay=layoutPieces(p.delen),pdf=new jsPDF({unit:"mm",format:"a4"}),letters="ABCDEFGHIJKLMNOP";
+  const title=`${it.i} ${it.n}`;
+  pdf.setFont("times","bold");pdf.setFontSize(26);pdf.text("M",15,22);pdf.setTextColor(255,0,0);pdf.text("M",15+pdf.getTextWidth("M"),22);pdf.setTextColor(0);
+  pdf.setFont("courier","normal");pdf.setFontSize(14);pdf.text(`${it.i}  ${it.n}`,15,34);
+  pdf.setFont("helvetica","normal");pdf.setFontSize(9.5);
+  pdf.text(`Maten: lengte ${fmt(M.lengte)} cm, armlengte ${fmt(M.arm)} cm, schouderbreedte ${fmt(M.schouder)} cm, borstomtrek ${fmt(M.borst)} cm, heupomtrek ${fmt(M.heup)} cm, beenlengte ${fmt(M.been)} cm.`,15,42,{maxWidth:180});
+  pdf.setFont("helvetica","bold");pdf.setFontSize(11);pdf.text("Print op ware grootte",15,56);
+  pdf.setFont("helvetica","normal");pdf.setFontSize(9.5);
+  pdf.text("Kies bij het printen '100 %' of 'Werkelijke grootte'. Het vierkant hieronder moet precies 5 x 5 cm zijn.",15,62,{maxWidth:180});
+  pdf.setLineWidth(.4);pdf.rect(15,70,50,50);pdf.setFontSize(9);pdf.text("5 x 5 cm",40,96,{align:"center"});
+  pdf.setFont("helvetica","bold");pdf.setFontSize(11);pdf.text("Plak de bladen aan elkaar",80,76);
+  pdf.setFont("helvetica","normal");pdf.setFontSize(9.5);
+  pdf.text(`${lay.cols*lay.rows} bladen: ${lay.cols} naast elkaar, ${lay.rows} onder elkaar. De letter is de rij, het cijfer de kolom.`,80,82,{maxWidth:115});
+  const s=Math.min(6,90/lay.cols);
+  for(let r=0;r<lay.rows;r++)for(let c=0;c<lay.cols;c++){pdf.rect(80+c*s*1.1,96+r*s*1.45,s*1.1,s*1.45);pdf.setFontSize(Math.max(5,s*1.2));pdf.text(letters[r]+(c+1),80+c*s*1.1+s*.55,96+r*s*1.45+s*.85,{align:"center"})}
+  let y=Math.max(130,96+lay.rows*s*1.45+10);
+  pdf.setFont("helvetica","bold");pdf.setFontSize(11);pdf.text("Patroondelen",15,y);pdf.setFont("helvetica","normal");pdf.setFontSize(9.5);
+  lay.pieces.forEach((pc,i)=>pdf.text(`- ${pc.naam}: knip ${pc.aantal}x, ${fmt(pc.wcm)} x ${fmt(pc.hcm)} cm`,15,y+7+i*6));
+  y+=14+lay.pieces.length*6;pdf.setFont("helvetica","bold");pdf.setFontSize(11);pdf.text("Materiaallijst",15,y);pdf.setFont("helvetica","normal");pdf.setFontSize(9.5);
+  p.mat.forEach((t,i)=>pdf.text("- "+t,15,y+7+i*6));
+  y+=14+p.mat.length*6;if(y+p.stappen.length*7+12>287){pdf.addPage();y=20}pdf.setFont("helvetica","bold");pdf.setFontSize(11);pdf.text("Stappenplan",15,y);pdf.setFont("helvetica","normal");pdf.setFontSize(9.5);
+  p.stappen.forEach((t,i)=>pdf.text(`${i+1}. ${t}`,15,y+7+i*6,{maxWidth:180}));
+  const PX=5,cv=document.createElement("canvas");cv.width=190*PX;cv.height=277*PX;const ctx=cv.getContext("2d");
+  for(let r=0;r<lay.rows;r++)for(let c=0;c<lay.cols;c++){
+    ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle="#fff";ctx.fillRect(0,0,cv.width,cv.height);
+    ctx.setTransform(PX,0,0,PX,-c*190*PX,-r*277*PX);lay.pieces.forEach(pc=>drawPiece(ctx,pc,title));
+    ctx.setTransform(PX,0,0,PX,0,0);ctx.strokeStyle="#999";ctx.lineWidth=.25;ctx.setLineDash([2,2]);ctx.strokeRect(.2,.2,189.6,276.6);ctx.setLineDash([]);
+    ctx.fillStyle="#000";ctx.font='6px "Alpina Tw", monospace';ctx.textAlign="left";ctx.textBaseline="top";ctx.fillText(letters[r]+(c+1),3,3);
+    pdf.addPage();pdf.addImage(cv.toDataURL("image/png"),"PNG",10,10,190,277,undefined,"FAST");
+  }
+  return{blob:pdf.output("blob"),name:`patroon-${it.i.replace(/[^A-Za-z0-9]+/g,"-")}.pdf`};
+}
+
+/* Foto's zitten in 10 pakketten (fotos/pak-0.bin ... pak-9.bin), zodat ze makkelijk op GitHub passen */
+const URLS=[],WAIT={};
+const fotoOf=i=>URLS[i]||"";
+function loadPacks(onPack){
+  const packs=[...new Set(COLL.map(it=>it.p))].filter(x=>x!=null).sort((a,b)=>a-b);
+  if(!packs.length){COLL.forEach((it,i)=>URLS[i]="fotos/"+it.f);onPack(null);return}
+  let chain=Promise.resolve();
+  packs.forEach(pk=>{chain=chain.then(()=>fetch("fotos/pak-"+pk+".bin").then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(buf=>{
+      COLL.forEach((it,i)=>{if(it.p===pk)URLS[i]=URL.createObjectURL(new Blob([new Uint8Array(buf,it.o,it.l)],{type:"image/jpeg"}))});
+    }).catch(()=>{COLL.forEach((it,i)=>{if(it.p===pk)URLS[i]="fotos/"+it.f})}).then(()=>onPack(pk)))});
+}
+
+/* ======================================================================
+   DESK
+   ====================================================================== */
+function startDesk(){
+  $("desk").hidden=false;
+  let code=newCode(),link=null,page="qr",item=null,phone={},phoneSeen=false,lastQid=null,meting=null,lastAct=Date.now(),remeasures=0;
+  const pages={qr:"pQR",grid:"pGrid",detail:"pDetail",load:"pLoad",result:"pResult",make:"pMake"};
+  /* schaal: het ontwerp is 1512 x 982 */
+  function scale(){
+    const cur=$(pages[page]),st=cur.querySelector(".stage");
+    const k=cur.dataset.k==="w"?innerWidth/1512:Math.min(innerWidth/1512,innerHeight/982);
+    st.style.zoom=k;
+  }
+  addEventListener("resize",scale);
+  function show(p,opts={}){
+    if(p!=="load")stopLoader();
+    page=p;Object.entries(pages).forEach(([k,id])=>$(id).hidden=k!==p);
+    scale();
+    if(!opts.keepScroll)scrollTo(0,0);
+    if(link)link.set({page:p,item:item!=null?COLL[item].i:null,remeasures});
+    if(p==="qr")startRing();else stopRing();
+  }
+  /* ---- QR + carrousel ---- */
+  function connect(){
+    if(link)link.close();
+    code=newCode();link=makeLink(code,"desk");phone={};phoneSeen=false;lastQid=null;meting=null;item=null;M={lengte:170,arm:60,schouder:40,borst:92,heup:98,been:80};
+    const url=location.href.split("#")[0]+"#t-"+code;
+    try{const q=qrcode(0,"M");q.addData(url);q.make();$("qr").innerHTML=q.createSvgTag({scalable:true,margin:0})}catch(e){$("qr").textContent=url}
+    $("qr").dataset.url=url;
+    link.onState(onPhone);link.onFoto(onFoto);
+    link.set({page:"qr",item:null,remeasures:0});
+  }
+  const ringItems=(()=>{const pick=[],seen=new Set();for(const it of COLL){if(!seen.has(it.n)&&pick.length<12){seen.add(it.n);pick.push(it)}}return pick})();
+  $("ring").innerHTML=ringItems.map(it=>`<figure><img data-i="${COLL.indexOf(it)}" alt=""></figure>`).join("");
+  const figs=[...$("ring").children];let ringRaf=0,ringT0=performance.now();
+  function ringStep(t){
+    const a0=(t-ringT0)/1000*(2*Math.PI/160);/* één toer per 160 s */
+    figs.forEach((f,i)=>{const a=a0+i*2*Math.PI/figs.length-Math.PI/2;const x=791+Math.cos(a)*640-118,y=700+Math.sin(a)*520-118;f.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`});
+    ringRaf=requestAnimationFrame(ringStep);
+  }
+  function startRing(){cancelAnimationFrame(ringRaf);ringRaf=requestAnimationFrame(ringStep)}
+  function stopRing(){cancelAnimationFrame(ringRaf)}
+
+  /* ---- raster ---- */
+  const grid=$("grid");
+  grid.innerHTML=COLL.map((it,i)=>`<button class="tile" data-i="${i}" style="--d:${(Math.random()*1.1).toFixed(2)}s"><span class="ph"><img data-i="${i}" alt="${esc(it.n)}" decoding="async"></span><span class="cap">${esc(it.n)}</span><span class="big" aria-hidden="true"><span class="bp"><img data-i="${i}" alt=""></span><span class="bc"><span>${esc(it.i)}</span><span>${esc(it.n)}</span><span>${esc(it.d)}</span></span></span></button>`).join("");
+  const tiles=[...grid.children];
+  loadPacks(()=>{document.querySelectorAll("#ring img[data-i],#grid .ph img[data-i]").forEach(im=>{if(!im.src){const u=fotoOf(+im.dataset.i);if(u)im.src=u}})});
+  grid.addEventListener("pointerover",e=>{const t=e.target.closest(".tile");if(!t)return;const im=t.querySelector(".big img");if(im&&!im.src&&fotoOf(+im.dataset.i))im.src=fotoOf(+im.dataset.i)});
+  grid.addEventListener("click",e=>{const t=e.target.closest(".tile");if(!t)return;openItem(+t.dataset.i)});
+  function applyFilter(res){
+    grid.classList.remove("leeg");
+    if(res&&!res.length){grid.classList.add("leeg");setTimeout(()=>grid.classList.remove("leeg"),1600);return}
+    const order=res?new Map(res.map((i,n)=>[i,n])):null;
+    tiles.forEach(t=>{const i=+t.dataset.i,on=!order||order.has(i);t.classList.toggle("uit",!on);t.style.order=order&&on?order.get(i):"";t.style.setProperty("--a",on?Math.min(.6,(order?order.get(i):0)*.02)+"s":"0s");t.style.animation="none";void t.offsetWidth;t.style.animation=""});
+  }
+  /* ---- detail ---- */
+  function openItem(i){
+    item=i;const it=COLL[i];
+    $("dInv").textContent=it.i;$("dDesc").textContent=it.t||"";
+    const img=$("dImg");img.src=fotoOf(i);img.alt=it.n;
+    $("pinIt").hidden=!it.k;
+    show("detail");fitZoom();
+  }
+  function fitZoom(){const img=$("dImg"),w=$("zoomwin");const go=()=>{const r=Math.min(463/img.naturalWidth,617/img.naturalHeight);w.style.width=img.naturalWidth*r+"px";w.style.height=img.naturalHeight*r+"px"};if(img.complete&&img.naturalWidth)go();else img.onload=go}
+  const zw=$("zoomwin");
+  zw.addEventListener("pointermove",e=>{const r=zw.getBoundingClientRect();const x=(e.clientX-r.left)/r.width*100,y=(e.clientY-r.top)/r.height*100;zw.querySelector("img").style.transformOrigin=`${x}% ${y}%`;zw.classList.add("on")});
+  zw.addEventListener("pointerleave",()=>zw.classList.remove("on"));
+  $("pinIt").addEventListener("click",()=>{remeasures=0;meting=null;show("load");startLoader()});
+
+  /* ---- laden ---- */
+  let lt=null,shown=0,target=0,phoneProg=0,done=false;
+  function startLoader(){
+    stopLoader();shown=0;target=0;phoneProg=0;done=false;
+    const t0=performance.now();
+    lt=setInterval(()=>{
+      const el=(performance.now()-t0)/1000;
+      const creep=Math.min(88,8*Math.log1p(el/1.5)*2.2);/* traag verder zolang de telefoon meet */
+      target=done?100:Math.max(creep*.5,Math.min(95,phoneProg*95),Math.min(target,95));
+      if(!done&&phoneProg<.2)target=Math.min(target,24);
+      shown+=(target-shown)*.12;if(done&&shown>99.4)shown=100;
+      $("pct").textContent=Math.floor(shown)+"%";$("fill").style.width=`calc(119px + (100% - 119px) * ${(shown/100).toFixed(4)})`;
+      if(done&&shown>=100){stopLoader();setTimeout(()=>{if(page==="load")showResult()},450)}
+    },50);
+  }
+  function stopLoader(){clearInterval(lt);lt=null}
+
+  /* ---- resultaat ---- */
+  function showResult(){
+    if(!meting)return;
+    $("rImg").src=meting.img;show("result");drawMeasures();
+  }
+  const LABELS=[
+    {k:"arm",t:"ArmLengte",lx:330,ly:186,nx:234,ny:188,side:"L"},
+    {k:"borst",t:"Borstomtrek",lx:379,ly:386,nx:270,ny:387,side:"L"},
+    {k:"schouder",t:"Schouderbreedte",lx:946,ly:195,nx:1146,ny:194,side:"R"},
+    {k:"heup",t:"Heupomtrek",lx:953,ly:381,nx:1086,ny:380,side:"R"},
+    {k:"been",t:"Beenlengte",lx:1021,ly:782,nx:1146,ny:784,side:"R"}];
+  function drawMeasures(){
+    const g=meting.geo,X=v=>461+v*485,Y=v=>148+v*754;
+    const lines={
+      schouder:[X(g.sh[0]),Y(g.sh[2]),X(g.sh[1]),Y(g.sh[2])],
+      borst:[X(g.ch[0]),Y(g.ch[2]),X(g.ch[1]),Y(g.ch[2])],
+      heup:[X(g.hp[0]),Y(g.hp[2]),X(g.hp[1]),Y(g.hp[2])],
+      arm:[X(g.arm[0]),Y(g.arm[1]),X(g.arm[0]),Y(g.arm[2])],
+      been:[X(g.leg[0]),Y(g.leg[1]),X(g.leg[0]),Y(g.leg[2])]};
+    const tgt={arm:[lines.arm[0],lines.arm[1]],borst:[lines.borst[0],lines.borst[1]],schouder:[lines.schouder[2],lines.schouder[3]],heup:[lines.heup[2],lines.heup[3]],been:null};
+    let svg="",lab="";
+    LABELS.forEach((L,n)=>{
+      const dl=(.3+n*.35).toFixed(2)+"s",dl2=(.6+n*.35).toFixed(2)+"s",ln=lines[L.k];
+      const lenL=Math.hypot(ln[2]-ln[0],ln[3]-ln[1]);
+      svg+=`<path class="ml" d="M${ln[0].toFixed(1)} ${ln[1].toFixed(1)} L${ln[2].toFixed(1)} ${ln[3].toFixed(1)}" style="opacity:0;animation:verschijn .5s ${dl} forwards,mars 1.6s linear infinite"/>`;
+      const uy=Math.max(L.ly,L.ny)+19;
+      let pts;
+      if(L.side==="L"){const x1=L.nx,x2=L.lx+L.t.length*9.2+6;const t=tgt[L.k];pts=[[x1,uy],[x2,uy],[Math.min(t[0]-6,x2+60),t[1]]]}
+      else{const x2=L.nx+64,x1=L.lx-10;const t=tgt[L.k];if(L.k==="been"){pts=[[x2,uy],[lines.been[0]+4,uy]]}else{pts=[[x2,uy],[x1,uy],[Math.max(t[0]+6,x1-60),t[1]]]}}
+      const d="M"+pts.map(p=>p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" L");
+      let len=0;for(let i=1;i<pts.length;i++)len+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);
+      svg+=`<path class="ld draw" d="${d}" style="--len:${len.toFixed(0)};stroke-dasharray:${len.toFixed(0)};--dl:${dl2}"/>`;
+      lab+=`<div class="lab" style="left:${L.lx}px;top:${L.ly}px;--dl:${dl2}">${L.t}</div><div class="num" style="left:${L.nx}px;top:${L.ny}px;--dl:${dl2}"><span contenteditable="true" inputmode="decimal" spellcheck="false" data-k="${L.k}">${fmt(M[L.k])}</span> cm</div>`;
+    });
+    $("meet").innerHTML=svg;$("labels").innerHTML=lab;
+    $("labels").querySelectorAll("[data-k]").forEach(s=>{
+      s.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();s.blur()}});
+      s.addEventListener("blur",()=>{const v=parseFloat(s.textContent.replace(",","."));if(isFinite(v)&&v>5&&v<250)M[s.dataset.k]=v;s.textContent=fmt(M[s.dataset.k])});
+    });
+  }
+  $("remeasure").addEventListener("click",()=>{remeasures++;meting=null;show("load");startLoader()});
+  $("seamless").addEventListener("click",()=>{renderMake();show("make")});
+
+  /* ---- maken ---- */
+  let curPat=null;
+  function renderMake(){
+    const it=COLL[item];curPat=patroon(it);
+    $("tiles5").innerHTML=curPat.delen.slice(0,5).map(([lib,naam])=>`<div class="pt5" title="${esc(naam)}">${pieceSVG(lib)}</div>`).join("");
+    $("mat").innerHTML=curPat.mat.map(t=>`<li>${esc(t)}</li>`).join("");
+    const Ys=[626,676,730,785,839,889];
+    $("steps").innerHTML=curPat.stappen.map((t,i)=>`<li style="top:${Ys[i]-626}px"><span class="vk"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="square"><path d="M4 12.5l5 5L20 6"/></svg></span><span>${esc(t)}</span></li>`).join("");
+  }
+  $("steps").addEventListener("click",e=>{const li=e.target.closest("li");if(li)li.classList.toggle("ok")});
+  $("dl").addEventListener("click",async()=>{
+    const b=$("dl");if(!curPat)return;b.classList.add("bezig");
+    try{const r=await buildPDF(COLL[item],curPat);const a=document.createElement("a");a.href=URL.createObjectURL(r.blob);a.download=r.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),15000)}
+    catch(e){console.error(e)}finally{b.classList.remove("bezig")}
+  });
+
+  /* ---- berichten van de telefoon ---- */
+  function onPhone(p){
+    if(!p||!p.on)return;
+    lastAct=Date.now();
+    if(!phoneSeen){phoneSeen=true;if(page==="qr")show("grid")}
+    grid.classList.toggle("zoekt",!!p.speaking&&(page==="grid"));
+    if(p.speaking&&page==="detail")show("grid",{keepScroll:false});
+    if(p.qid&&p.qid!==lastQid){lastQid=p.qid;if(page!=="grid")show("grid");applyFilter(find(p.q));scrollTo({top:0,behavior:"smooth"})}
+    if(p.lengte)M.lengte=p.lengte;
+    if(page==="load"&&typeof p.prog==="number"&&p.ronde===remeasures)phoneProg=Math.max(phoneProg,p.prog);
+    phone=p;
+  }
+  function onFoto(d){
+    if(!d||!d.img||d.ronde!==remeasures||page!=="load")return;
+    meting=d;Object.keys(d.maten||{}).forEach(k=>{if(d.maten[k])M[k]=Math.round(d.maten[k]*2)/2});
+    done=true;
+  }
+  document.querySelectorAll("[data-home]").forEach(m=>m.addEventListener("click",()=>{if(page==="qr")return;if(page==="grid"){applyFilter(null);return}show("grid")}));
+  addEventListener("keydown",e=>{if(e.key==="Escape"&&page!=="qr"&&page!=="grid")show("grid")});
+  ["pointermove","pointerdown","keydown","wheel"].forEach(ev=>addEventListener(ev,()=>{lastAct=Date.now()},{passive:true}));
+  /* na 4 minuten zonder iets te doen: terug naar de QR-code met een nieuwe code */
+  setInterval(()=>{if(page!=="qr"&&Date.now()-lastAct>240000){if(link)link.set({page:"einde"});connect();applyFilter(null);show("qr")}},5000);
+  connect();show("qr");
+}
+
+/* ======================================================================
+   TELEFOON
+   ====================================================================== */
+function startPhone(code){
+  $("phone").hidden=false;
+  const link=makeLink(code,"telefoon");
+  let desk={},qid=0,ronde=0,lengte=null;
+  try{lengte=+sessionStorage.getItem("mis-lengte")||null}catch(e){}
+  link.set({on:true,speaking:false,lengte,prog:0,ronde:0});
+  const fp={mic:$("fMic"),len:$("fLen"),cam:$("fCam")};let cur="mic";
+  function showF(p){if(cur===p)return;cur=p;Object.entries(fp).forEach(([k,el])=>el.hidden=k!==p);if(p!=="cam")stopCam();if(p==="len")setTimeout(()=>{try{$("lenIn").focus()}catch(e){}},250);if(p==="cam")resetCam()}
+  link.onState(d=>{
+    desk=d;if(!d.page)return;
+    if(d.page==="einde"){showF("mic");return}
+    if(d.page==="load"){if((d.remeasures||0)!==ronde||cur==="mic"){ronde=d.remeasures||0;camState="uit"}showF(lengte?"cam":"len");if(lengte&&cur==="cam"&&camState==="uit")startCam();link.set({prog:lengte?.25:.05,ronde})}
+    else if(d.page==="result"){/* telefoon blijft op het camerabeeld */}
+    else showF("mic");
+  });
+
+  /* ---- microfoon ---- */
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const mic=$("mic"),ringd=$("ringd"),ringv=$("ringv");
+  let rec=null,listening=false,heard="",partial="",talkUntil=0,downAt=0,toggleMode=false,amp=0,raf=0;
+  function waveLoop(t){
+    const talking=performance.now()<talkUntil;
+    amp+=((talking?16:0)-amp)*.12;
+    const R=318,N=160,k=14,ph=t/140;let d="";
+    for(let i=0;i<=N;i++){const a=i/N*Math.PI*2,r=R+amp*Math.sin(k*a+ph)*(0.6+0.4*Math.sin(3*a-ph*.7));d+=(i?"L":"M")+(399+Math.cos(a)*r).toFixed(1)+" "+(399+Math.sin(a)*r).toFixed(1)}
+    ringv.setAttribute("d",d+"Z");
+    if(listening||amp>.3)raf=requestAnimationFrame(waveLoop);
+  }
+  function setPressed(on){mic.classList.toggle("druk",on);ringd.style.display=on?"none":"";if(on)ringv.removeAttribute("hidden");else ringv.setAttribute("hidden","");if(on){cancelAnimationFrame(raf);raf=requestAnimationFrame(waveLoop)}}
+  function startListen(){
+    if(listening)return;heard="";partial="";
+    setPressed(true);listening=true;link.set({speaking:true});
+    if(!SR)return;
+    try{
+      rec=new SR();rec.lang="nl-BE";rec.interimResults=true;rec.continuous=true;rec.maxAlternatives=1;
+      rec.onresult=e=>{let it="";for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];if(r.isFinal)heard+=" "+r[0].transcript;else it+=r[0].transcript}partial=it;talkUntil=performance.now()+700};
+      rec.onspeechstart=()=>{talkUntil=performance.now()+900};
+      rec.onerror=()=>{};
+      rec.onend=()=>{if(listening&&!toggleMode){finish()}else if(listening){try{rec.start()}catch(e){finish()}}};
+      rec.start();
+    }catch(e){}
+  }
+  function finish(){
+    if(!listening)return;listening=false;toggleMode=false;
+    setPressed(false);
+    const q=(heard+" "+partial).trim();
+    link.set(q?{speaking:false,q,qid:++qid+"-"+Date.now()}:{speaking:false});
+  }
+  function stopListen(){if(!listening)return;toggleMode=false;if(rec){try{rec.stop()}catch(e){finish()}setTimeout(()=>{if(listening)finish()},1500)}else finish()}
+  mic.addEventListener("pointerdown",e=>{e.preventDefault();try{mic.setPointerCapture(e.pointerId)}catch(_){}if(listening&&toggleMode){stopListen();return}downAt=performance.now();startListen()});
+  const up=()=>{if(!listening||toggleMode)return;if(performance.now()-downAt<350){toggleMode=true;return}stopListen()};
+  mic.addEventListener("pointerup",up);mic.addEventListener("pointercancel",up);
+  mic.addEventListener("contextmenu",e=>e.preventDefault());
+
+  /* ---- lengte ---- */
+  const lenIn=$("lenIn");let lenTimer=0;
+  function takeLen(){const v=parseFloat(lenIn.value.replace(",","."));if(!(v>=100&&v<=230))return false;lengte=Math.round(v);try{sessionStorage.setItem("mis-lengte",lengte)}catch(e){}lenIn.blur();link.set({lengte,prog:.25,ronde});showF("cam");return true}
+  lenIn.addEventListener("input",()=>{lenIn.value=lenIn.value.replace(/[^\d.,]/g,"");clearTimeout(lenTimer);if(/^\d{3}$/.test(lenIn.value))lenTimer=setTimeout(takeLen,900)});
+  $("lenForm").addEventListener("submit",e=>{e.preventDefault();takeLen()});
+  lenIn.addEventListener("blur",()=>{if(cur==="len")takeLen()});
+
+  /* ---- camera + meten ---- */
+  let stream=null,pose=null,camState="uit",camRaf=0,okFrames=0,samples=[],countStart=0,lastTs=0,lastGood=null;
+  function resetCam(){$("camGo").hidden=false;$("camLive").hidden=true;$("still").hidden=true;$("video").hidden=false;$("tel").hidden=true}
+  function drawSilh(){
+    /* stippellijn-silhouet: halve contour, gespiegeld */
+    const R=[[112,92],[118,104],[150,114],[164,128],[172,176],[180,236],[186,292],[190,318],[178,328],[168,298],[160,240],[152,186],[146,166],[146,222],[142,262],[150,302],[148,362],[142,424],[138,486],[146,508],[110,510],[108,444],[106,364],[100,334]];
+    const pts=R.concat(R.slice().reverse().map(([x,y])=>[200-x,y]));
+    let d="M"+pts.map(p=>p.join(" ")).join(" L")+"Z";
+    $("silhG").innerHTML=`<circle cx="100" cy="50" r="36"/><path d="${d}" stroke-linejoin="round"/>`;
+  }
+  drawSilh();
+  $("camGo").addEventListener("click",startCam);
+  async function startCam(){
+    $("camGo").hidden=true;$("camLive").hidden=false;$("still").hidden=true;$("video").hidden=false;$("silh").classList.remove("ok");
+    camState="start";
+    try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:1280},height:{ideal:1280}},audio:false})}
+    catch(e){camState="uit";resetCam();return}
+    const v=$("video");v.srcObject=stream;try{await v.play()}catch(e){}
+    link.set({prog:.32,ronde});
+    try{pose=pose||await loadPose()}catch(e){console.error(e);return}
+    camState="zoek";okFrames=0;samples=[];link.set({prog:.4,ronde});loop();
+  }
+  function stopCam(){cancelAnimationFrame(camRaf);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}if(camState!=="klaar")camState="uit"}
+  async function loadPose(){
+    const m=await import("./mediapipe/vision_bundle.mjs");
+    const fs=await m.FilesetResolver.forVisionTasks(new URL("mediapipe/wasm",location.href).href);
+    const opts=d=>({baseOptions:{modelAssetPath:new URL("mediapipe/pose_landmarker_lite.task",location.href).href,delegate:d},runningMode:"VIDEO",numPoses:1,outputSegmentationMasks:true});
+    try{return await m.PoseLandmarker.createFromOptions(fs,opts("GPU"))}catch(e){return await m.PoseLandmarker.createFromOptions(fs,opts("CPU"))}
+  }
+  function loop(){
+    const v=$("video");cancelAnimationFrame(camRaf);
+    const step=()=>{
+      if(!stream||camState==="klaar"||camState==="uit")return;
+      if(v.readyState>=2&&v.videoWidth){let ts=performance.now();if(ts<=lastTs)ts=lastTs+1;lastTs=ts;pose.detectForVideo(v,ts,res=>onPose(res,v.videoWidth,v.videoHeight))}
+      camRaf=requestAnimationFrame(step);
+    };camRaf=requestAnimationFrame(step);
+  }
+  function onPose(res,W,H){
+    const lm=res.landmarks&&res.landmarks[0],silh=$("silh"),tel=$("tel");
+    if(!lm){okFrames=0;silh.classList.remove("ok");tel.hidden=true;return}
+    const mask=res.segmentationMasks&&res.segmentationMasks[0];
+    const m=measureFrom(lm,mask?mask.getAsFloat32Array():null,mask?mask.width:0,mask?mask.height:0,W,H);
+    if(!m.ok){okFrames=0;samples=[];silh.classList.remove("ok");tel.hidden=true;if(camState==="tel")camState="zoek";return}
+    silh.classList.add("ok");okFrames++;
+    if(camState==="zoek"&&okFrames>10){camState="tel";countStart=performance.now();samples=[]}
+    if(camState==="tel"){
+      samples.push(m);lastGood=m;
+      const el=(performance.now()-countStart)/1000,left=3-Math.floor(el);
+      link.set({prog:Math.min(.92,.5+el/3*.42),ronde});
+      if(left>0){tel.hidden=false;tel.textContent=left}else{tel.hidden=true;finishMeasure(W,H)}
+    }
+  }
+  const med=a=>{a=a.filter(x=>x!=null&&isFinite(x)).sort((p,q)=>p-q);return a.length?a[Math.floor(a.length/2)]:null};
+  function finishMeasure(W,H){
+    camState="klaar";cancelAnimationFrame(camRaf);
+    const v=$("video"),maten={};
+    ["arm","schouder","borst","heup","been"].forEach(k=>{const x=med(samples.map(s=>s.maten[k]));if(x)maten[k]=x});
+    /* foto bijsnijden rond het lichaam in de verhouding van het fotokader (485 x 754) */
+    const g=lastGood.box,ratio=485/754;
+    let ch=Math.min(H,(g.y2-g.y1)*H*1.12),cw=ch*ratio;if(cw>W){cw=W;ch=cw/ratio}
+    const cx=(g.x1+g.x2)/2*W,cy=(g.y1+g.y2)/2*H;
+    let sx=Math.max(0,Math.min(W-cw,cx-cw/2)),sy=Math.max(0,Math.min(H-ch,cy-ch/2));
+    const cv=document.createElement("canvas");cv.width=485;cv.height=754;const ctx=cv.getContext("2d");
+    ctx.drawImage(v,sx,sy,cw,ch,0,0,485,754);
+    const img=cv.toDataURL("image/jpeg",.78);
+    const nx=x=>(x*W-sx)/cw,ny=y=>(y*H-sy)/ch,G=lastGood.geo;
+    const geo={sh:[nx(G.sh[0]),nx(G.sh[1]),ny(G.sh[2])],ch:[nx(G.ch[0]),nx(G.ch[1]),ny(G.ch[2])],hp:[nx(G.hp[0]),nx(G.hp[1]),ny(G.hp[2])],
+      arm:[nx(G.arm[0]),ny(G.arm[1]),ny(G.arm[2])],leg:[nx(G.leg[0]),ny(G.leg[1]),ny(G.leg[2])]};
+    /* de desk toont de foto zoals anderen je zien: niet gespiegeld */
+    const st=$("still");st.src=img;st.hidden=false;v.hidden=true;$("silh").classList.remove("ok");
+    stopCam();camState="klaar";
+    link.set({prog:1,ronde});link.foto({img,maten,geo,ronde});
+  }
+  /* maten uit lichaamspunten en silhouet; geeft ook de lijnen voor de desk (genormaliseerd 0..1 in het camerabeeld) */
+  function measureFrom(lm,mask,mw,mh,W,H){
+    const vis=i=>lm[i]&&(lm[i].visibility??1)>.5,P=i=>({x:lm[i].x*W,y:lm[i].y*H}),d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+    if(![11,12,23,24].every(vis))return{ok:false};
+    const feet=[27,28].every(vis)&&Math.max(lm[27].y,lm[28].y)<=.99;
+    let top=null;
+    if(mask){const nx=Math.round(lm[0].x*mw),band=Math.round(mw*.06);for(let y=0;y<mh&&top==null;y++)for(let x=Math.max(0,nx-band);x<Math.min(mw,nx+band);x++)if(mask[y*mw+x]>.5){top=y/mh*H;break}}
+    if(top==null)top=P(0).y-(P(24).y-P(12).y)*.3;
+    if(top<H*.01)return{ok:false};
+    const hipY=(P(23).y+P(24).y)/2,shY=(P(11).y+P(12).y)/2,torso=hipY-shY,cx=(P(23).x+P(24).x)/2;
+    const footY=feet?Math.max(...[27,28,29,30,31,32].filter(vis).map(i=>P(i).y)):null;
+    const px=feet?footY-top:(hipY-top)/.52;
+    if((feet?px:hipY-top)<H*(feet?.45:.3))return{ok:false};
+    const cm=(lengte||170)/px;
+    const widthAt=yp=>{if(!mask)return null;const my=Math.round(yp/H*mh),mx=Math.round(cx/W*mw);if(my<0||my>=mh||mask[my*mw+mx]<=.5)return null;let l=mx,r=mx;while(l>0&&mask[my*mw+l-1]>.5)l--;while(r<mw-1&&mask[my*mw+r+1]>.5)r++;return[l/mw,(r+1)/mw]};
+    const chY=shY+torso*.28,hpY=hipY+torso*.1;
+    const cw=widthAt(chY)||[Math.min(lm[11].x,lm[12].x),Math.max(lm[11].x,lm[12].x)];
+    const hw=widthAt(hpY)||[Math.min(lm[23].x,lm[24].x)-.03,Math.max(lm[23].x,lm[24].x)+.03];
+    const armOk=[13,15,14,16].every(vis);
+    const arm=armOk?((d(P(11),P(13))+d(P(13),P(15)))+(d(P(12),P(14))+d(P(14),P(16))))/2*cm*1.05:null;
+    const legOk=[25,27,26,28].every(vis);
+    const been=legOk?((d(P(23),P(25))+d(P(25),P(27)))+(d(P(24),P(26))+d(P(26),P(28))))/2*cm*1.04:null;
+    const shL=Math.min(lm[11].x,lm[12].x),shR=Math.max(lm[11].x,lm[12].x);
+    /* lichaamskader */
+    const xs=lm.filter((p,i)=>i>10&&vis(i)).map(p=>p.x);const x1=Math.max(0,Math.min(...xs)-.06),x2=Math.min(1,Math.max(...xs)+.06);
+    const y1=Math.max(0,top/H-.03),y2=Math.min(1,(feet?footY:hipY+torso*1.9)/H+.03);
+    /* in het beeld links van het lichaam (de desk toont het niet gespiegeld) */
+    const wristY=armOk?Math.max(lm[15].y,lm[16].y):hipY/H;
+    const geo={sh:[shL,shR,shY/H],ch:[cw[0],cw[1],chY/H],hp:[hw[0],hw[1],hpY/H],
+      arm:[Math.max(0,x1+.01),shY/H,wristY],leg:[Math.min(1,x2-.01),hipY/H,feet?footY/H:Math.min(1,(hipY+torso*1.9)/H)]};
+    return{ok:true,maten:{schouder:d(P(11),P(12))*cm*1.15,arm,borst:cw&&(cw[1]-cw[0])*W*cm*2.7,heup:hw&&(hw[1]-hw[0])*W*cm*2.7,been},geo,box:{x1,x2,y1,y2}};
+  }
+}
+
+if(ROLE==="telefoon")startPhone(H[1]);else startDesk();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Old+Standard+TT&display=swap">
+</body>
+</html>
